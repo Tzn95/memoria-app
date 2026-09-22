@@ -1,0 +1,1 @@
+export default function Home(){return <main className="wrap section"><h1>MEMORIA</h1><p>Memoriali digitali accessibili tramite QR.</p><a className="btn" href="/m/pinco-pallino-demo">Apri memoriale demo</a></main>}

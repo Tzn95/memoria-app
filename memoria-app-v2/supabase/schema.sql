@@ -1,0 +1,11 @@
+create extension if not exists pgcrypto;
+create table memorials (id uuid primary key default gen_random_uuid(), slug text unique not null, full_name text not null, birth_date text, birth_place text, death_date text, death_place text, quote text, biography text, cemetery text, grave_location text, map_url text, hero_image_url text, published boolean default false, created_at timestamptz default now());
+create table timeline_events (id uuid primary key default gen_random_uuid(), memorial_id uuid references memorials(id) on delete cascade, event_date text, title text not null, description text, sort_order int default 0);
+create table media (id uuid primary key default gen_random_uuid(), memorial_id uuid references memorials(id) on delete cascade, type text check(type in ('image','video')), url text not null, caption text, sort_order int default 0);
+create table dedications (id uuid primary key default gen_random_uuid(), memorial_id uuid references memorials(id) on delete cascade, author_name text, message text not null, approved boolean default false, created_at timestamptz default now());
+alter table memorials enable row level security; alter table timeline_events enable row level security; alter table media enable row level security; alter table dedications enable row level security;
+create policy "public published memorials" on memorials for select using (published=true);
+create policy "public timeline" on timeline_events for select using (exists(select 1 from memorials m where m.id=memorial_id and m.published=true));
+create policy "public media" on media for select using (exists(select 1 from memorials m where m.id=memorial_id and m.published=true));
+create policy "public approved dedications" on dedications for select using (approved=true and exists(select 1 from memorials m where m.id=memorial_id and m.published=true));
+create policy "public submit dedication" on dedications for insert with check (approved=false);
