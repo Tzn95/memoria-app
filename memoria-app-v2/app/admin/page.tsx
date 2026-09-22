@@ -28,7 +28,7 @@ const emptyForm = {
   cemetery_row: "",
   cemetery_spot: "",
   maps_url: "",
-  status: "draft",
+  status: "draft",main_photo_url: "",
 };
 
 export default function Admin() {
