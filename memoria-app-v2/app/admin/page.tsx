@@ -191,6 +191,7 @@ async function uploadMainPhoto(file: File) {
       slug,
       first_name: form.first_name.trim(),
       last_name: form.last_name.trim(),
+      main_photo_url: form.main_photo_url || null,
 
       birth_date: form.birth_date || null,
       birth_place: form.birth_place.trim() || null,
