@@ -16,3 +16,4 @@ Stack scelto: Next.js + Supabase.
 
 ## Mancante prima della produzione
 Autenticazione admin, upload Storage, salvataggio form, generazione QR PNG/SVG, antispam/moderazione dediche, dominio e deploy.
+    Test deploy automatico Vercel
