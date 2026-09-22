@@ -40,6 +40,49 @@ export default function Admin() {
   const [saving, setSaving] = useState(false);
 
   const [message, setMessage] = useState("");
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+
+async function uploadMainPhoto(file: File) {
+  try {
+    setUploadingPhoto(true);
+    setMessage("");
+
+    const extension = file.name.split(".").pop() || "jpg";
+    const fileName = `${crypto.randomUUID()}.${extension}`;
+    const filePath = `main-photos/${fileName}`;
+
+    const { error: uploadError } = await supabase.storage
+      .from("memorial-media")
+      .upload(filePath, file, {
+        cacheControl: "3600",
+        upsert: false,
+      });
+
+    if (uploadError) {
+      throw uploadError;
+    }
+
+    const { data } = supabase.storage
+      .from("memorial-media")
+      .getPublicUrl(filePath);
+
+    setForm((current) => ({
+      ...current,
+      main_photo_url: data.publicUrl,
+    }));
+
+    setMessage("Foto principale caricata correttamente.");
+  } catch (error) {
+    console.error(error);
+    setMessage(
+      error instanceof Error
+        ? `Errore caricamento foto: ${error.message}`
+        : "Errore durante il caricamento della foto."
+    );
+  } finally {
+    setUploadingPhoto(false);
+  }
+}
   const [showForm, setShowForm] = useState(false);
 
   const [form, setForm] = useState(emptyForm);
@@ -408,6 +451,36 @@ export default function Admin() {
                   onChange={updateField}
                 />
               </div>
+              <label>Foto principale</label>
+
+<input
+  type="file"
+  accept="image/jpeg,image/png,image/webp"
+  disabled={uploadingPhoto}
+  onChange={(e) => {
+    const file = e.target.files?.[0];
+    if (file) uploadMainPhoto(file);
+  }}
+/>
+
+{uploadingPhoto && <p>Caricamento foto...</p>}
+
+{form.main_photo_url && (
+  <div style={{ marginBottom: "24px" }}>
+    <img
+      src={form.main_photo_url}
+      alt="Anteprima foto principale"
+      style={{
+        width: "160px",
+        height: "160px",
+        objectFit: "cover",
+        borderRadius: "12px",
+        marginTop: "10px",
+      }}
+    />
+    <p>Foto caricata ✓</p>
+  </div>
+)}
 
               <label>Frase commemorativa</label>
 
